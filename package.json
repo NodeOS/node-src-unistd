@@ -1,0 +1,8 @@
+{
+  "name": "src-unistd",
+  "version": "0.0.0",
+  "description": "Node Getty Replacement",
+  "main": "unistd.js",
+  "author": "Jacob Groundwater <groundwater@gmail.com>",
+  "license": "MIT"
+}
