@@ -9,22 +9,27 @@ using namespace v8;
 using namespace node;
 
 NAN_METHOD(GetForegroundProcessGroup) {
-  NanScope();
-  int fd = Handle<Integer>::Cast(args[0])->Value();
+  Nan::HandleScope scope;
+
+  int fd = Handle<Integer>::Cast(info[0])->Value();
   pid_t res = tcgetpgrp(fd);
-  NanReturnValue(NanNew<Integer>(res));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(res));
 }
 
 NAN_METHOD(SetForegroundProcessGroup) {
-  NanScope();
-  int fd = Handle<Integer>::Cast(args[0])->Value();
-  pid_t pid = Handle<Integer>::Cast(args[1])->Value();
+  Nan::HandleScope scope;
+
+  int fd = Handle<Integer>::Cast(info[0])->Value();
+  pid_t pid = Handle<Integer>::Cast(info[1])->Value();
   int res = tcsetpgrp(fd,pid);
-  NanReturnValue(NanNew<Integer>(res));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(res));
 }
 
 NAN_METHOD(IgnoreSig) {
-  NanScope();
+  Nan::HandleScope scope;
+
   sigset_t set;
   sigemptyset(&set);
   sigaddset(&set, SIGTTOU);
@@ -32,86 +37,103 @@ NAN_METHOD(IgnoreSig) {
   sigaddset(&set, SIGTSTP);
   // sigaddset(&set, SIGCHLD);
   sigprocmask(SIG_BLOCK, &set, NULL);
-  NanReturnUndefined();
+
+  return;
 }
 
 NAN_METHOD(SetControllingTTY) {
-  NanScope();
-  int fd = args[0]->Int32Value();
+  Nan::HandleScope scope;
+
+  int fd = info[0]->Int32Value();
   int rt = ioctl (fd, TIOCSCTTY, NULL);
-  NanReturnValue(NanNew<Integer>(rt));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(rt));
 }
 
 NAN_METHOD(VHangUp) {
-  NanScope();
+  Nan::HandleScope scope;
+
   int ret = vhangup();
-  NanReturnValue(NanNew<Integer>(ret));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(ret));
 }
 
 NAN_METHOD(SetGID) {
-  NanScope();
-  pid_t pid = Handle<Integer>::Cast(args[0])->Value();
-  pid_t pgid = Handle<Integer>::Cast(args[1])->Value();
+  Nan::HandleScope scope;
+
+  pid_t pid = Handle<Integer>::Cast(info[0])->Value();
+  pid_t pgid = Handle<Integer>::Cast(info[1])->Value();
   int res = setpgid(pid,pgid);
-  NanReturnValue(NanNew<Integer>(res));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(res));
 }
 
 NAN_METHOD(GetGID) {
-  NanScope();
-  pid_t pid = Handle<Integer>::Cast(args[0])->Value();
+  Nan::HandleScope scope;
+
+  pid_t pid = Handle<Integer>::Cast(info[0])->Value();
   int res = getpgid(pid);
-  NanReturnValue(NanNew<Integer>(res));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(res));
 }
 
 NAN_METHOD(SetSID) {
-  NanScope();
+  Nan::HandleScope scope;
+
   int sid = setsid();
-  NanReturnValue(NanNew<Integer>(sid));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(sid));
 }
 
 NAN_METHOD(GetSID) {
-  NanScope();
-  pid_t pid = Handle<Integer>::Cast(args[0])->Value();
+  Nan::HandleScope scope;
+
+  pid_t pid = Handle<Integer>::Cast(info[0])->Value();
   int sid = getsid(pid);
-  NanReturnValue(NanNew<Integer>(sid));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(sid));
 }
 
 NAN_METHOD(Fork) {
-  NanScope();
+  Nan::HandleScope scope;
+
   int pid = fork();
-  NanReturnValue(NanNew<Integer>(pid));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(pid));
 }
 
 NAN_METHOD(Dup) {
-  NanScope();
-  int fd = args[0]->Int32Value();
+  Nan::HandleScope scope;
+
+  int fd = info[0]->Int32Value();
   int dd = dup(fd);
-  NanReturnValue(NanNew<Integer>(dd));
+
+  info.GetReturnValue().Set(Nan::New<Integer>(dd));
 }
 
 void init(Handle<Object> exports) {
-  exports->Set(NanNew<String>("ignore"),
-    NanNew<FunctionTemplate>(IgnoreSig)->GetFunction());
-  exports->Set(NanNew<String>("getpgid"),
-    NanNew<FunctionTemplate>(GetGID)->GetFunction());
-  exports->Set(NanNew<String>("setpgid"),
-    NanNew<FunctionTemplate>(SetGID)->GetFunction());
-  exports->Set(NanNew<String>("tcgetpgrp"),
-    NanNew<FunctionTemplate>(GetForegroundProcessGroup)->GetFunction());
-  exports->Set(NanNew<String>("tcsetpgrp"),
-    NanNew<FunctionTemplate>(SetForegroundProcessGroup)->GetFunction());
-  exports->Set(NanNew<String>("dup"),
-    NanNew<FunctionTemplate>(Dup)->GetFunction());
-  exports->Set(NanNew<String>("fork"),
-    NanNew<FunctionTemplate>(Fork)->GetFunction());
-  exports->Set(NanNew<String>("setControllingTTY"),
-    NanNew<FunctionTemplate>(SetControllingTTY)->GetFunction());
-  exports->Set(NanNew<String>("vhangup"),
-    NanNew<FunctionTemplate>(VHangUp)->GetFunction());
-  exports->Set(NanNew<String>("getsid"),
-    NanNew<FunctionTemplate>(GetSID)->GetFunction());
-  exports->Set(NanNew<String>("setsid"),
-    NanNew<FunctionTemplate>(SetSID)->GetFunction());
+  exports->Set(Nan::New<String>("ignore").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(IgnoreSig)->GetFunction());
+  exports->Set(Nan::New<String>("getpgid").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(GetGID)->GetFunction());
+  exports->Set(Nan::New<String>("setpgid").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(SetGID)->GetFunction());
+  exports->Set(Nan::New<String>("tcgetpgrp").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(GetForegroundProcessGroup)->GetFunction());
+  exports->Set(Nan::New<String>("tcsetpgrp").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(SetForegroundProcessGroup)->GetFunction());
+  exports->Set(Nan::New<String>("dup").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(Dup)->GetFunction());
+  exports->Set(Nan::New<String>("fork").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(Fork)->GetFunction());
+  exports->Set(Nan::New<String>("setControllingTTY").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(SetControllingTTY)->GetFunction());
+  exports->Set(Nan::New<String>("vhangup").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(VHangUp)->GetFunction());
+  exports->Set(Nan::New<String>("getsid").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(GetSID)->GetFunction());
+  exports->Set(Nan::New<String>("setsid").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(SetSID)->GetFunction());
 }
 
 NODE_MODULE(binding, init)
