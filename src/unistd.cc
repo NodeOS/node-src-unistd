@@ -53,7 +53,13 @@ NAN_METHOD(SetControllingTTY) {
 NAN_METHOD(VHangUp) {
   Nan::HandleScope scope;
 
-  int ret = vhangup();
+  // `vhangup` is a Linux-specific function, simply do a no-op and return
+  // success in other platforms
+  #if __linux__
+    int ret = vhangup();
+  #else
+    int ret = 0;
+  #endif
 
   info.GetReturnValue().Set(Nan::New<Integer>(ret));
 }
