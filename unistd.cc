@@ -8,6 +8,7 @@
 using namespace v8;
 using namespace node;
 
+
 NAN_METHOD(GetForegroundProcessGroup) {
   Nan::HandleScope scope;
 
@@ -117,6 +118,18 @@ NAN_METHOD(Dup) {
   info.GetReturnValue().Set(Nan::New<Integer>(dd));
 }
 
+NAN_METHOD(Dup2) {
+  Nan::HandleScope scope;
+
+  int oldfd = info[0]->Int32Value();
+  int newfd = info[0]->Int32Value();
+
+  int dd = dup2(oldfd, newfd);
+
+  info.GetReturnValue().Set(Nan::New<Integer>(dd));
+}
+
+
 void init(Handle<Object> exports) {
   exports->Set(Nan::New<String>("ignore").ToLocalChecked(),
     Nan::New<FunctionTemplate>(IgnoreSig)->GetFunction());
@@ -130,6 +143,8 @@ void init(Handle<Object> exports) {
     Nan::New<FunctionTemplate>(SetForegroundProcessGroup)->GetFunction());
   exports->Set(Nan::New<String>("dup").ToLocalChecked(),
     Nan::New<FunctionTemplate>(Dup)->GetFunction());
+  exports->Set(Nan::New<String>("dup2").ToLocalChecked(),
+    Nan::New<FunctionTemplate>(Dup2)->GetFunction());
   exports->Set(Nan::New<String>("fork").ToLocalChecked(),
     Nan::New<FunctionTemplate>(Fork)->GetFunction());
   exports->Set(Nan::New<String>("setControllingTTY").ToLocalChecked(),
