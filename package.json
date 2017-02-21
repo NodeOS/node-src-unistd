@@ -1,7 +1,7 @@
 {
-  "name": "src-unistd",
+  "name": "unistd",
   "version": "0.0.0",
-  "description": "Node Getty Replacement",
+  "description": "`unistd` for NodeOS / Linux",
   "main": "build/Release/binding.node",
   "author": "Jacob Groundwater <groundwater@gmail.com>",
   "contributors": [
